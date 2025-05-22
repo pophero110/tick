@@ -15,6 +15,7 @@ import (
 
 type Task struct {
 	Title      string    `json:"title"`
+	Kind       string    `json:"kind"`
 	Content    string    `json:"content,omitempty"`
 	Desc       string    `json:"desc,omitempty"`
 	IsAllDay   bool      `json:"isAllDay,omitempty"`
@@ -26,6 +27,7 @@ type Task struct {
 	Priority   int       `json:"priority,omitempty"`
 	SortOrder  int       `json:"sortOrder,omitempty"`
 	Items      []Subtask `json:"items,omitempty"`
+	Tags       []string  `json:"tags,omitempty"`
 }
 
 type Subtask struct {
@@ -38,7 +40,7 @@ type Subtask struct {
 	CompletedTime string `json:"completedTime,omitempty"`
 }
 
-func createTask(title string) {
+func createTask(kind string, title string) {
 	accessToken := os.Getenv("TICKTOKEN")
 
 	// task := Task{
@@ -58,6 +60,8 @@ func createTask(title string) {
 
 	task := Task{
 		Title: title,
+		Kind:  kind,
+		Tags:   []string{"tick"},
 	}
 
 	jsonData, err := json.Marshal(task)
@@ -146,14 +150,17 @@ func auth() {
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: tick <command>")
-		fmt.Println("tick new <Title>: Create a new task")
+		fmt.Println("tick task <Title>: Create a new task")
+		fmt.Println("tick note <Title>: Create a new note")
 		fmt.Println("tick auth: Authentication")
 		return
 	}
 
 	switch os.Args[1] {
-	case "new":
-		createTask(os.Args[2])
+	case "task":
+		createTask("TASK", os.Args[2])
+	case "note":
+		createTask("NOTE", os.Args[2])
 	case "auth":
 		auth()
 	default:
